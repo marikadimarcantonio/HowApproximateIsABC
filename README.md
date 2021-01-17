@@ -1,11 +1,14 @@
 # HowApproximateIsABC
 Project of the Bayesian Statistics's course at Politecnico di Milano A.Y. 2020/2021
 
-### 1stPresentation
+### _1stPresentation_
 Introduction to the ABC algorithm.
 
-### 2ndPresentation
+### _2ndPresentation_
 Practical difficulties on implementing ABC.
 
 ## GenusDataset
-Analizing practical difficulties in ABC algorithm: summary statistics and kernel.
+Analizing practical difficulties in ABC algorithm: how to choose summary statistics and kernel.
+
+## DarwinDataset 
+Analizing practical difficulties in ABC algorithm: how to choose the proposal.
