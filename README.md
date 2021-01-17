@@ -7,6 +7,9 @@ Introduction to the ABC algorithm.
 ### _2ndPresentation_
 Practical difficulties on implementing ABC.
 
+> ### ReachDataset
+Analizing practical difficulties in ABC algorithm: how to choose _acceptance rate_ and _tolerance_.
+
 > ### GenusDataset
 Analizing practical difficulties in ABC algorithm: how to choose _summary statistics_ and _kernel_.
 
