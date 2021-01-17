@@ -7,8 +7,8 @@ Introduction to the ABC algorithm.
 ### _2ndPresentation_
 Practical difficulties on implementing ABC.
 
-## GenusDataset
+> GenusDataset
 Analizing practical difficulties in ABC algorithm: how to choose _summary statistics_ and _kernel_.
 
-## DarwinDataset 
+> DarwinDataset 
 Analizing practical difficulties in ABC algorithm: how to choose the _proposal_.
