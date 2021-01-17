@@ -6,3 +6,6 @@ Introduction to the ABC algorithm.
 
 # 2ndPresentation
 Practical difficulties on implementing ABC.
+
+# GenusDataset
+Analizing practical difficulties in ABC algorithm: summary statistics and kernel.
