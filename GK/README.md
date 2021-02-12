@@ -1,4 +1,4 @@
-Examples with the _univariate g-and-k distribution_ by using *Wesserstein distance*
+Examples with the _univariate g-and-k distribution_ by using *Wasserstein distance*
 
 > WABC_acc-rej: example based on the _acceptance-rejection algorithm_
 
