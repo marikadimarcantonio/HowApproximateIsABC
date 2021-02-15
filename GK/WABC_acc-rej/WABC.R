@@ -76,7 +76,7 @@ mymcmc = function(x, N, model=c("gk", "gh"), logB=FALSE, get_log_prior=improper_
 }
 
 set.seed(1)
-x = rgk(10, A=3, B=1, g=2, k=0.5) ##An unusually small dataset for fast execution of this example
+x = rgk(10, A=3, B=1, g=2, k=0.5) ##mall dataset for fast execution
 x11()
 out = mymcmc(x, N=2047, theta0=c(mean(x),sd(x),0,0), Sigma0=0.1*diag(4))
 
@@ -114,22 +114,22 @@ myabc = function(x, N, rprior, M, sumstats=c("all order statistics", "octiles", 
   sobs = sort(x)
   simStats = function(theta) sort(rgk(nobs, A=theta[1], B=theta[2], g=theta[3], k=theta[4]))
   batch_size = 10^4
-    nbatches = ceiling(N / batch_size)
-    last_batch_size = N %% batch_size
-    if (last_batch_size == 0) { last_batch_size = batch_size }
-    if (!silent) { prog_bar = progress::progress_bar$new(total = nbatches, format = "[:bar] :percent eta: :eta") }
-    batch_out = myabc_batch(sobs, rprior(batch_size), simStats, M)
-    samp = batch_out$samp
+  nbatches = ceiling(N / batch_size)
+  last_batch_size = N %% batch_size
+  if (last_batch_size == 0) { last_batch_size = batch_size }
+  if (!silent) { prog_bar = progress::progress_bar$new(total = nbatches, format = "[:bar] :percent eta: :eta") }
+  batch_out = myabc_batch(sobs, rprior(batch_size), simStats, M)
+  samp = batch_out$samp
+  if (!silent) { prog_bar$tick() }
+  next_batch_size = batch_size
+  for (b in 2:nbatches) {
+    if (b==nbatches) { next_batch_size = last_batch_size }
+    next_samp = myabc_batch(sobs, rprior(next_batch_size), simStats, M)$samp
+    samp = rbind(samp, next_samp)
+    toacc = order(samp[,5])[1:M]
+    samp = samp[toacc,]
     if (!silent) { prog_bar$tick() }
-    next_batch_size = batch_size
-    for (b in 2:nbatches) {
-      if (b==nbatches) { next_batch_size = last_batch_size }
-      next_samp = myabc_batch(sobs, rprior(next_batch_size), simStats, M)$samp
-      samp = rbind(samp, next_samp)
-      toacc = order(samp[,5])[1:M]
-      samp = samp[toacc,]
-      if (!silent) { prog_bar$tick() }
-
+    
   }
   colnames(samp) = c("A","B", "g", "k", "distance")
   return(samp)
@@ -147,7 +147,7 @@ myabc_batch = function(sobs, priorSims, simStats, M) {
 ## Wasserstein distance ##
 risultato<-myabc(ys, N=2.4*10^6, rprior=rprior, M=2048,sumstats="all order statistics")
 ## weighted euclidean distance ##
-risultato <- abc(ys,N=2.4*10^6, "gk",rprior=rprior,M=2048,sumstats="all order statistics") 
+#risultato <- abc(ys,N=2.4*10^6, "gk",rprior=rprior,M=2048,sumstats="all order statistics") 
 
 x11()
 par (mfrow=c(2,2))
@@ -158,18 +158,15 @@ plot((risultato[,4]), main='k', type='l', xlab='Iterations', ylab= '')
 
 x11()
 par (mfrow=c(2,2))
-plot(density(out[,1]), main='A', ylim=c(0,1.1))
-legend(4, 0.8, legend=c("Target", "Result"),col=c("black", "red"), lty=1:1, cex=0.8)
-points(density(risultato[,1]),col='red',pch=20,cex=0.2, main='A')
-plot(density(out[,2]), main='B', ylim=c(0,0.8))
-legend(3, 0.6, legend=c("Target", "Result"),col=c("black", "red"), lty=1:1, cex=0.8)
-points(density(risultato[,2]),col='red', pch=20,cex=0.2, main='A')
+plot(density(out[,1]), main='A')
+#legend(3.7, 1.2, legend=c("Target", "Result"),col=c("black", "red"), lty=1:1, cex=0.8)
+points(density(risultato[,1]),col='red',type='l', main='A')
+plot(density(out[,2]), main='B')
+points(density(risultato[,2]),col='red', type='l', main='A')
 plot(density(out[,3]), main='g')
-legend(5, 0.3, legend=c("Target", "Result"),col=c("black", "red"), lty=1:1, cex=0.8)
-points(density(risultato[,3]),col='red', pch=20,cex=0.2, main='A')
+points(density(risultato[,3]),col='red', type='l', main='A')
 plot(density(out[,4]), main='k')
-legend(1, 1.7, legend=c("Target", "Result"),col=c("black", "red"), lty=1:1, cex=0.8)
-points(density(risultato[,4]),col='red', pch=20,cex=0.2, main='A')
+points(density(risultato[,4]),col='red', type='l', main='A')
 
 
 graphics.off()
