@@ -17,6 +17,4 @@ Analizing practical difficulties in ABC algorithm: how to choose _summary statis
 Analizing practical difficulties in ABC algorithm: how to choose the _proposal_.
 
 ### _3rdPresentation_
-Example with the _univariate g-and-k distribution_ 
-
-based on https://github.com/pierrejacob/winference and https://github.com/dennisprangle/abctools
+Example with the _univariate g-and-k distribution_ based on https://github.com/pierrejacob/winference and https://github.com/dennisprangle/abctools
