@@ -78,7 +78,8 @@ mymcmc = function(x, N, model=c("gk", "gh"), logB=FALSE, get_log_prior=improper_
 set.seed(1)
 x = rgk(10, A=3, B=1, g=2, k=0.5) ##mall dataset for fast execution
 x11()
-out = mymcmc(x, N=2047, theta0=c(mean(x),sd(x),0,0), Sigma0=0.1*diag(4))
+out = mymcmc(x, N=75000, theta0=c(mean(x),sd(x),0,0), Sigma0=0.1*diag(4))
+out = out[50000:75000,1:4]
 
 x11()
 par (mfrow=c(2,2))
@@ -169,4 +170,4 @@ plot(density(out[,4]), main='k')
 points(density(risultato[,4]),col='red', type='l', main='A')
 
 
-graphics.off()
+#graphics.off()
