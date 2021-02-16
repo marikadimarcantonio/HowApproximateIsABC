@@ -108,7 +108,7 @@ rprior = function(i) {
         runif(i,0,10), 
         runif(i,0,10))}
 
-myabc = function(x, N, rprior, M, sumstats=c("all order statistics", "octiles", "moment estimates"), silent=FALSE) {
+myabc = function(x, N, rprior, M, silent=FALSE) {
   nobs = length(x)
   # Define simStats: a function to simulate one set of summary statistics
   # and sobs: the observed summary statistics
@@ -146,7 +146,7 @@ myabc_batch = function(sobs, priorSims, simStats, M) {
 }
 
 ## Wasserstein distance ##
-risultato<-myabc(ys, N=2.4*10^6, rprior=rprior, M=2048,sumstats="all order statistics")
+risultato<-myabc(ys, N=2.4*10^6, rprior=rprior, M=2048)
 ## weighted euclidean distance ##
 #risultato <- abc(ys,N=2.4*10^6, "gk",rprior=rprior,M=2048,sumstats="all order statistics") 
 
