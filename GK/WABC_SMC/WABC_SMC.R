@@ -259,17 +259,18 @@ set.seed(1)
 x <- rgk(10,a,b,g,k,c=0.8)
 
 x11()
-out = mymcmc(x, N=2047, theta0=c(mean(x),sd(x),0,0), Sigma0=0.1*diag(4))
+out = mymcmc(x, N=75000, theta0=c(mean(x),sd(x),0,0), Sigma0=0.1*diag(4))
+out.new <- out[50000:75000,]
 
 
 x11()
 par (mfrow=c(2,2))
-plot(density(out[,1]), main='A', ylim=c(0,4.2))
+plot(density(out.new[,1]), main='A', ylim=c(0,4.2))
 points(density(ris[,1]),col='red',type='l', main='A')
-plot(density(out[,2]), main='B', ylim=c(0,2.1))
+plot(density(out.new[,2]), main='B', ylim=c(0,2.1))
 points(density(ris[,2]),col='red', type='l', main='B')
-plot(density(out[,3]), main='g', xlim=c(-2,10.2))
+plot(density(out.new[,3]), main='g', xlim=c(-2,10.2))
 points(density(ris[,3]),col='red', type='l', main='g')
-plot(density(out[,4]), main='k', ylim=c(0,2.6))
+plot(density(out.new[,4]), main='k', ylim=c(0,2.6))
 points(density(ris[,4]),col='red', type='l', main='k')
 
