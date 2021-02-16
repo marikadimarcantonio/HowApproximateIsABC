@@ -2,20 +2,52 @@ library(gk)
 library(Ecdat)
 library(ggplot2)
 
-# Parameters
-n = 250    
-a = 3
-b = 1
-g = 2
-k = 0.5
+###################################################################################################################
 
-# Observed data
-ys <- rgk(n,a,b,g,k,c=0.8)
+myabc = function(x, N, rprior, M, silent=FALSE) {
+  nobs = length(x)
+  # Define simStats: a function to simulate one set of summary statistics
+  # and sobs: the observed summary statistics
+  sobs = sort(x)
+  simStats = function(theta) sort(rgk(nobs, A=theta[1], B=theta[2], g=theta[3], k=theta[4]))
+  batch_size = 10^4
+  nbatches = ceiling(N / batch_size)
+  last_batch_size = N %% batch_size
+  if (last_batch_size == 0) { last_batch_size = batch_size }
+  if (!silent) { prog_bar = progress::progress_bar$new(total = nbatches, format = "[:bar] :percent eta: :eta") }
+  batch_out = myabc_batch(sobs, rprior(batch_size), simStats, M)
+  samp = batch_out$samp
+  if (!silent) { prog_bar$tick() }
+  next_batch_size = batch_size
+  for (b in 2:nbatches) {
+    if (b==nbatches) { next_batch_size = last_batch_size }
+    next_samp = myabc_batch(sobs, rprior(next_batch_size), simStats, M)$samp
+    samp = rbind(samp, next_samp)
+    toacc = order(samp[,5])[1:M]
+    samp = samp[toacc,]
+    if (!silent) { prog_bar$tick() }
+    
+  }
+  colnames(samp) = c("A","B", "g", "k", "distance")
+  return(samp)
+}
+
+myabc_batch = function(sobs, priorSims, simStats, M) {
+  summaries = apply(priorSims, 1, simStats)
+  # Calculate distances
+  d = apply(summaries, 2, function(s) { sum(abs(s-sobs))/N })
+  # Construct and return output
+  toacc = order(d)[1:M]
+  samp = cbind(priorSims[toacc,], d[toacc])
+  list(samp=samp)
+}
+
 
 improper_uniform_log_density = function(theta) {
   if (theta[2]<0 || theta[4]<0) return(-Inf)
   return(0)
 }
+
 mymcmc = function(x, N, model=c("gk", "gh"), logB=FALSE, get_log_prior=improper_uniform_log_density, theta0, Sigma0, t0=100, epsilon=1E-6, silent=FALSE, plotEvery=100) {
   if (!is.numeric(x)) stop("x must be numeric (a vector of observations)")
   if (!silent) { oldask = par(ask=FALSE) } ##Don't ask before progress plots
@@ -75,6 +107,8 @@ mymcmc = function(x, N, model=c("gk", "gh"), logB=FALSE, get_log_prior=improper_
   output
 }
 
+###################################################################
+
 set.seed(1)
 x = rgk(10, A=3, B=1, g=2, k=0.5) ##mall dataset for fast execution
 x11()
@@ -95,10 +129,13 @@ g_new <- 2.1
 k_new <- 0.5
 
 y_new <- rgk(n,a_new,b_new,g_new,k_new,c=0.8)
+
 x11()
 par (mfrow=c(1,2))
 plot(density(ys),main='g-and-k distribution')
 plot(density(y_new), main='Observed g-and-k distribution')
+
+
 
 N_particles = 2048
 N = 2.4*10^6
@@ -108,42 +145,15 @@ rprior = function(i) {
         runif(i,0,10), 
         runif(i,0,10))}
 
-myabc = function(x, N, rprior, M, silent=FALSE) {
-  nobs = length(x)
-  # Define simStats: a function to simulate one set of summary statistics
-  # and sobs: the observed summary statistics
-  sobs = sort(x)
-  simStats = function(theta) sort(rgk(nobs, A=theta[1], B=theta[2], g=theta[3], k=theta[4]))
-  batch_size = 10^4
-  nbatches = ceiling(N / batch_size)
-  last_batch_size = N %% batch_size
-  if (last_batch_size == 0) { last_batch_size = batch_size }
-  if (!silent) { prog_bar = progress::progress_bar$new(total = nbatches, format = "[:bar] :percent eta: :eta") }
-  batch_out = myabc_batch(sobs, rprior(batch_size), simStats, M)
-  samp = batch_out$samp
-  if (!silent) { prog_bar$tick() }
-  next_batch_size = batch_size
-  for (b in 2:nbatches) {
-    if (b==nbatches) { next_batch_size = last_batch_size }
-    next_samp = myabc_batch(sobs, rprior(next_batch_size), simStats, M)$samp
-    samp = rbind(samp, next_samp)
-    toacc = order(samp[,5])[1:M]
-    samp = samp[toacc,]
-    if (!silent) { prog_bar$tick() }
-    
-  }
-  colnames(samp) = c("A","B", "g", "k", "distance")
-  return(samp)
-}
-myabc_batch = function(sobs, priorSims, simStats, M) {
-  summaries = apply(priorSims, 1, simStats)
-  # Calculate distances
-  d = apply(summaries, 2, function(s) { sum(abs(s-sobs))/N })
-  # Construct and return output
-  toacc = order(d)[1:M]
-  samp = cbind(priorSims[toacc,], d[toacc])
-  list(samp=samp)
-}
+# Parameters
+n = 250    
+a = 3
+b = 1
+g = 2
+k = 0.5
+
+# Observed data
+ys <- rgk(n,a,b,g,k,c=0.8)
 
 ## Wasserstein distance ##
 risultato<-myabc(ys, N=2.4*10^6, rprior=rprior, M=2048)
